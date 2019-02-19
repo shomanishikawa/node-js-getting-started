@@ -31,7 +31,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Used when we create a client/build for production
-app.use('/static', express.static(path.join(__dirname, 'client', 'build', 'static')));
+app.use('/static', express.static(path.join(__dirname, '..', 'client', 'build', 'static')));
 
 //
 // This server
@@ -74,7 +74,7 @@ if (process.env.NODE_ENV !== 'production') {
   // When in production
   // All url paths go to the bundled index.html
   app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
   });
 }
 

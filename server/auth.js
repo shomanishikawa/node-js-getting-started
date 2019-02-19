@@ -31,17 +31,19 @@ passport.use(new Strategy((username, password, cb) => {
 // serializing, and querying the user record by ID from the database when
 // deserializing.
 passport.serializeUser((user, cb) => {
-  cb(null, user.id);
+  // console.log('USER', user);
+  cb(null, user);
 });
 
 passport.deserializeUser((id, cb) => {
-  db.findById(id, (err, user) => {
-    if (err) {
-      cb(err);
-      return;
-    }
-    cb(null, user);
-  });
+  // db.findById(id, (err, user) => {
+  //   if (err) {
+  //     cb(err);
+  //     return;
+  //   }
+  //   cb(null, user);
+  // });
+  cb(null, id);
 });
 
 function ensureLoggedIn(req, res, next) {

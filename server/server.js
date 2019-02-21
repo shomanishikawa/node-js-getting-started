@@ -61,7 +61,7 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
-    res.redirect('/app');
+    res.redirect('/home');
   });
 
 
@@ -69,7 +69,7 @@ if (process.env.NODE_ENV !== 'production') {
   const apiProxy = proxy('/', { target: 'http://localhost:3000', ws: true });
   app.use(apiProxy);
 } else {
-  app.get('/*', (req, res) => {
+  app.get('/*', auth.ensureLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
   });
 }

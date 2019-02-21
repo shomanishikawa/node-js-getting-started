@@ -148,11 +148,23 @@ const styles = theme => ({
     display: 'flex',
   },
   formControl: {
-    margin: theme.spacing.unit * 3,
+    margin: 0,
+    width: '100%',
+    padding: '0 30px',
+    marginBottom: '30px',
   },
   formGroup: {
     margin: `${theme.spacing.unit}px 0`,
   },
+  formLabel: {
+    textAlign: 'left',
+  },
+  formFocus: {
+    color: 'rgba(0, 0, 0, 0.54) !important',
+  },
+  radio: {
+    padding: '5px',
+  }
 });
 
 export default styles;

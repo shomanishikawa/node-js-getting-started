@@ -41,12 +41,12 @@ const muiTheme = createMuiTheme({
 class App extends Component {
   constructor() {
     super();
+    
     this.state = {
       user: null,
-      value: 'female',
       questions: [],
-      answers: [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
       loaded: false,
+      userLoaded: false,
     };
 
     this.base = new Airtable({apiKey: 'keykMFBqNhPAlAjvp'}).base('appzxqfrpXeu0ZN9p');
@@ -54,15 +54,14 @@ class App extends Component {
     this.base('main').select({
       maxRecords: 9999,
       view: "Grid view"
-    }).eachPage((records, fetchNextPage) => {
+    }).eachPage(records => {
       this.setState({loaded: true, questions: _.map(records, (record, i) => {
+
         return {
           name: record.get('name'),
+          id: record.get('id'),
           options: Object.entries(record.fields).map(([key,value]) => {
-            if (key === 'name') {
-              return null;
-            }
-
+            if (key === 'name' || key === 'id' || key === 'points' || key === 'winner') { return null; }
             return {
               letter: key,
               value,
@@ -78,66 +77,91 @@ class App extends Component {
   componentDidMount() {
     fetch('/api/user', { credentials: 'same-origin' })
       .then(res => res.json())
-      .then((res) => {
-        this.setState({ user: res.user });
+      .then(res => {
+        this.base('users').select({
+          maxRecords: 9999,
+          view: "Grid view"
+        }).eachPage(records => {
+          const theUser = _.find(records, { fields: { name: res.user.displayName } } );
+
+          if (theUser) {
+            this.setState({ user: theUser, userLoaded: true });
+          } else {
+            this.base('users').create({
+              "name": res.user.displayName,
+            }, (err, record) => {
+                if (err) { console.error(err); return; }
+                this.setState({ user: record, userLoaded: true });
+            });
+          }
+        }, err => {
+          if (err) { console.error(err); return; }
+        });
+
       });
   }
 
   handleChange = event => {
-    const theAnswers = this.state.answers;
-    theAnswers[event.target.name] = event.target.value;
-    this.setState({ answers: theAnswers });
+    this.base('main').update(this.state.user.id, {
+      [event.target.name]: event.target.value
+    }, (err, record) => {
+        if (err) { console.error(err); return; }
+        this.setState({ user: record });
+    });
   };
 
   render() {
     const { classes } = this.props;
-    const { questions, loaded } = this.state;
+    const { questions, loaded, userLoaded, user } = this.state;
 
     return (
       <MuiThemeProvider theme={muiTheme}>
         <div className="App">
           <CssBaseline />
+
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
           </header>
-          <Grid container spacing={24}>
-            <Grid item xs={12} sm={6}>
-              <div className="App-intro" style={{width: '500px', margin:'0 auto'}}>
-                <p>To get started, edit <code>src/App.js</code> and save to reload.</p>
-                <p><a href="/">back to express server</a></p>
-                <pre style={{textAlign: "left", background: "#eee"}}>{JSON.stringify(this.state.user, null, 2)}</pre>
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              {loaded && (
-                <div className={classes.formRoot}>
-                  <FormControl component="fieldset" className={classes.formControl}>
-                    {questions.map((question, i) => (
-                      <div key={i}>
-                        <FormLabel component="legend">{question.name}</FormLabel>
-                        <RadioGroup
-                          aria-label={question.name}
-                          name={i}
-                          className={classes.formGroup}
-                          value={this.state.answers[i]}
-                          onChange={this.handleChange}
-                        >
-                          {question.options.map((option, j) => {
-                            if (option) {
-                              return (<FormControlLabel key={j} value={option.letter} control={<Radio />} label={option.value} />)
-                            }
-                            return null;
-                          })}
-                        </RadioGroup>
-                      </div>
-                    ))}
-                  </FormControl>
-                </div>
-              )}
 
+          {loaded && userLoaded && (
+            <Grid container spacing={24}>
+              {questions.map((question, i) => (
+                <Grid item xs={12} sm={6} key={i}>
+                  <FormControl component="fieldset" className={classes.formControl}>
+                    <FormLabel
+                      component="legend"
+                      classes={{
+                        focused: classes.formFocus,
+                        root: classes.formLabel
+                      }}>
+                      {question.name}
+                    </FormLabel>
+                    <RadioGroup
+                      aria-label={question.name}
+                      name={question.id}
+                      className={classes.formGroup}
+                      value={user.fields[question.id]}
+                      onChange={this.handleChange}
+                    >
+                      {_.orderBy(question.options, 'letter').map((option, j) => {
+                        if (option) {
+                          return (
+                            <FormControlLabel
+                              key={j}
+                              value={option.letter}
+                              className={classes.formLabel}
+                              control={<Radio className={classes.radio} />}
+                              label={option.value} />
+                          )
+                        }
+                        return null;
+                      })}
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
+              ))}
             </Grid>
-          </Grid>
+          )}
         </div>
       </MuiThemeProvider>
     );

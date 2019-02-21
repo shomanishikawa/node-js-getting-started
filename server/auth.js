@@ -48,7 +48,7 @@ passport.deserializeUser((id, cb) => {
 
 function ensureLoggedIn(req, res, next) {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
-    res.redirect('/login');
+    res.redirect('/');
   } else {
     next();
   }

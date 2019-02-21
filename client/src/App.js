@@ -53,13 +53,13 @@ class App extends Component {
 
             <header className="App-header">
               <img src={logo} className="App-logo" alt="logo" />
-              <Link to="/home" className={classes.mainLink}>HOME</Link>
+              <Link to="/app" className={classes.mainLink}>HOME</Link>
               <Link to="/ballot" className={classes.mainLink}>BALLOT</Link>
             </header>
 
             <div className="main-content">
               <Route
-                path="/home"
+                path="/app"
                 exact
                 render={props => <HomePage />}
               />

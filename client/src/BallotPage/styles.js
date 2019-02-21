@@ -159,6 +159,10 @@ const styles = theme => ({
   formLabel: {
     textAlign: 'left',
   },
+  formLabelCorrect: {
+    textAlign: 'left',
+    background: '#00800078',
+  },
   formFocus: {
     color: 'rgba(0, 0, 0, 0.54) !important',
   },

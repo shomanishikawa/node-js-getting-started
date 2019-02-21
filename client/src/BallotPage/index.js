@@ -4,7 +4,6 @@ import Airtable from 'airtable';
 import _ from 'lodash';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import styles from './styles';
 
 import Radio from '@material-ui/core/Radio';
@@ -12,6 +11,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 
 class BallotPage extends Component {
@@ -27,7 +27,7 @@ class BallotPage extends Component {
 
     this.base = new Airtable({apiKey: 'keykMFBqNhPAlAjvp'}).base('appzxqfrpXeu0ZN9p');
 
-    this.base('main').select({
+    this.base('awards').select({
       maxRecords: 9999,
       view: "Grid view"
     }).eachPage(records => {
@@ -36,6 +36,7 @@ class BallotPage extends Component {
         return {
           name: record.get('name'),
           id: record.get('id'),
+          winner: record.get('winner'),
           options: Object.entries(record.fields).map(([key,value]) => {
             if (key === 'name' || key === 'id' || key === 'points' || key === 'winner') { return null; }
             return {
@@ -78,7 +79,11 @@ class BallotPage extends Component {
   }
 
   handleChange = event => {
-    this.base('main').update(this.state.user.id, {
+    if (this.props.status !== 'open') {
+      return;
+    }
+
+    this.base('users').update(this.state.user.id, {
       [event.target.name]: event.target.value
     }, (err, record) => {
         if (err) { console.error(err); return; }
@@ -87,7 +92,7 @@ class BallotPage extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, status } = this.props;
     const { questions, loaded, userLoaded, user } = this.state;
 
     return (
@@ -117,7 +122,7 @@ class BallotPage extends Component {
                         <FormControlLabel
                           key={j}
                           value={option.letter}
-                          className={classes.formLabel}
+                          className={(status !== 'open' && question.winner && (question.winner === option.letter)) ? classes.formLabelCorrect : classes.formLabel}
                           control={<Radio className={classes.radio} />}
                           label={option.value} />
                       )
@@ -138,6 +143,7 @@ class BallotPage extends Component {
 
 BallotPage.propTypes = {
   classes: PropTypes.object.isRequired,
+  status: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles, { withTheme: true })(BallotPage);

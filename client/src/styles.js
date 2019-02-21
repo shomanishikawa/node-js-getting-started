@@ -68,10 +68,22 @@ const styles = theme => ({
   'contentShift-left': {
     marginLeft: 0,
   },
+  linkContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: '30px',
+  },
   mainLink: {
-    color: '#FFF',
-    textDecoration: 'none',
+    color: 'black',
+    textDecoration: 'underline',
     fontSize: 18,
+    display: 'block',
+    margin: '0 14px',
+    transition: 'all .1s ease-in',
+    '&:hover': {
+        color: 'grey'
+     }
   },
   flexGrow: {
     flexGrow: 1,

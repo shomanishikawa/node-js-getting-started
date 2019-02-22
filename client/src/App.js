@@ -66,7 +66,7 @@ class App extends Component {
             <CssBaseline />
 
             <header className="App-header">
-              {/* <img src={logo} className="App-logo" alt="logo" /> */}
+              <img src={logo} className="App-logo" alt="logo" />
             </header>
 
             <section className={classes.linkContainer}>

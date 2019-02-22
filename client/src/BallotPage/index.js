@@ -4,6 +4,8 @@ import Airtable from 'airtable';
 import _ from 'lodash';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
 import styles from './styles';
 
 import Radio from '@material-ui/core/Radio';
@@ -138,10 +140,15 @@ class BallotPage extends Component {
                     focused: classes.formFocus,
                     root: classes.formLabel
                   }}>
-                  {question.name}
+                  {status === 'closed' && question.winner && (question.winner === user.fields[question.id]) && (
+                    <CheckIcon className={classes.correct}/>
+                  )}
+                  {status === 'closed' && question.winner && (question.winner !== user.fields[question.id]) && (
+                    <CloseIcon className={classes.wrong}/>
+                  )}
+                  {question.name} ({question.points})
                 </FormLabel>
                 <RadioGroup
-
                   aria-label={question.name}
                   name={question.id}
                   className={classes.formGroup}

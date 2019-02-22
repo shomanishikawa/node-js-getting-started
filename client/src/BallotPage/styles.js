@@ -168,6 +168,18 @@ const styles = theme => ({
   },
   radio: {
     padding: '5px',
+  },
+  correct: {
+    position: 'relative',
+    top: '5px',
+    left: '-8px',
+    color: 'green',
+  },
+  wrong: {
+    position: 'relative',
+    top: '6px',
+    left: '-9px',
+    color: 'red',
   }
 });
 

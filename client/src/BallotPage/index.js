@@ -15,14 +15,15 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 
 
 class BallotPage extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       user: null,
       questions: [],
       loaded: false,
       userLoaded: false,
+      otherUserId: props.match.params.id,
     };
 
     this.base = new Airtable({apiKey: 'keykMFBqNhPAlAjvp'}).base('appzxqfrpXeu0ZN9p');
@@ -37,6 +38,7 @@ class BallotPage extends Component {
           name: record.get('name'),
           id: record.get('id'),
           winner: record.get('winner'),
+          points: record.get('points'),
           options: Object.entries(record.fields).map(([key,value]) => {
             if (key === 'name' || key === 'id' || key === 'points' || key === 'winner') { return null; }
             return {
@@ -59,17 +61,25 @@ class BallotPage extends Component {
           maxRecords: 9999,
           view: "Grid view"
         }).eachPage(records => {
-          const theUser = _.find(records, { fields: { name: res.user.displayName } } );
+          if (!this.state.otherUserId) {
+            const theUser = _.find(records, { fields: { name: res.user.displayName } } );
 
-          if (theUser) {
-            this.setState({ user: theUser, userLoaded: true });
+            if (theUser) {
+              this.setState({ user: theUser, userLoaded: true });
+            } else {
+              this.base('users').create({
+                "name": res.user.displayName,
+              }, (err, record) => {
+                  if (err) { console.error(err); return; }
+                  this.setState({ user: record, userLoaded: true });
+              });
+            }
           } else {
-            this.base('users').create({
-              "name": res.user.displayName,
-            }, (err, record) => {
-                if (err) { console.error(err); return; }
-                this.setState({ user: record, userLoaded: true });
-            });
+            const theUser = _.find(records, { id: this.state.otherUserId } );
+            if (theUser) {
+              this.setState({ user: theUser, userLoaded: true });
+            }
+            return;
           }
         }, err => {
           if (err) { console.error(err); return; }
@@ -91,6 +101,19 @@ class BallotPage extends Component {
     });
   };
 
+  calculateScore = (user) => {
+    const { questions } = this.state;
+
+    return Object.entries(user.fields).reduce((total, [key,value]) => {
+      if (key === 'name' || key === 'score') { return total; }
+      if (value === _.find(questions, ['id', key]).winner) {
+        return total + parseInt(_.find(questions, ['id', key]).points);
+      } else {
+        return total;
+      }
+    }, 0);
+  }
+
   render() {
     const { classes, status } = this.props;
     const { questions, loaded, userLoaded, user } = this.state;
@@ -98,6 +121,14 @@ class BallotPage extends Component {
     return (
       (loaded && userLoaded) ? (
         <Grid container spacing={24}>
+          <Grid item xs={12} sm={12}>
+            <h2>
+              {user.get('name')}
+              {status === 'closed' && (
+                <span>&nbsp;-&nbsp;{this.calculateScore(user)}</span>
+              )}
+            </h2>
+          </Grid>
           {questions.map((question, i) => (
             <Grid item xs={12} sm={6} key={i}>
               <FormControl component="fieldset" className={classes.formControl}>
@@ -110,6 +141,7 @@ class BallotPage extends Component {
                   {question.name}
                 </FormLabel>
                 <RadioGroup
+
                   aria-label={question.name}
                   name={question.id}
                   className={classes.formGroup}
@@ -123,7 +155,7 @@ class BallotPage extends Component {
                           key={j}
                           value={option.letter}
                           className={(status !== 'open' && question.winner && (question.winner === option.letter)) ? classes.formLabelCorrect : classes.formLabel}
-                          control={<Radio className={classes.radio} />}
+                          control={<Radio className={classes.radio} disabled={status === 'closed'}/>}
                           label={option.value} />
                       )
                     }

@@ -1,5 +1,6 @@
 <html>
 <head>
+  <meta name="viewport" content="width=device-width">
   <style media="screen">
     body {
       background: #333;
@@ -9,16 +10,18 @@
     main {
 			padding: 2em;
       margin: 2em auto;
-      width: 500px;
+      width: 100%;
       background: white;
+      text-align: center;
     }
+
   </style>
 <body>
   <main>
-		<h1>Oscar Soirée</h1>
+		<h1>Oscar Soirée 2019</h1>
 
 		<% if (!user) { %>
-			<p>Welcome! Please <a href="/auth/google">log in</a>.</p>
+			<p><a href="/auth/google">Log in with your Google account</a>.</p>
 		<% } else { %>
 			<p>Visit the <a href="/">APP</a></p>
 		<% } %>

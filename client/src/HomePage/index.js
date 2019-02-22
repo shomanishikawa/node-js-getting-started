@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Airtable from 'airtable';
 import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
@@ -78,14 +80,27 @@ class HomePage extends Component {
   }
 
   render() {
+    const { status, classes } = this.props;
     const { loaded, userLoaded, users } = this.state;
+
     return (
       (loaded && userLoaded) ? (
         <div>
-          <h3>Leaderboard:</h3>
+          <h3>STANDINGS</h3>
           <div>
             {_.orderBy(users, [this.calculateScore.bind(this)], ['desc']).map((user, i) => (
-              <h4 key={i}>{user.get('name')} - {this.calculateScore(user)}</h4>
+              <h4 key={i}>
+                {status === 'closed' ? (
+                  <div>
+                    <Link to={`/ballot/${user.id}`} className={classes.mainLink}>{user.get('name')}</Link>
+                    <span>&nbsp;-&nbsp;{this.calculateScore(user)}</span>
+                  </div>
+                ) : (
+                  <div>
+                    {user.get('name')}
+                  </div>
+                )}
+              </h4>
             ))}
           </div>
         </div>
@@ -94,6 +109,10 @@ class HomePage extends Component {
       )
     );
   }
+};
+
+HomePage.propTypes = {
+  status: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(HomePage);

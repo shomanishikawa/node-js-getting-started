@@ -66,7 +66,7 @@ class App extends Component {
             <CssBaseline />
 
             <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
+              {/* <img src={logo} className="App-logo" alt="logo" /> */}
             </header>
 
             <section className={classes.linkContainer}>
@@ -78,12 +78,16 @@ class App extends Component {
               <Route
                 path="/app"
                 exact
-                render={props => <HomePage status={status} />}
+                render={props => <HomePage {...props} status={status} />}
               />
               <Route
                 path="/ballot"
                 exact
-                render={props => <BallotPage status={status} />}
+                render={props => <BallotPage {...props} status={status} />}
+              />
+              <Route
+                path="/ballot/:id"
+                render={props => <BallotPage {...props} status={status} />}
               />
             </div>
 

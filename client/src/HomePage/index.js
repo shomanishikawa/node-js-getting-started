@@ -145,7 +145,7 @@ class HomePage extends Component {
           <Grid item xs={12} sm={4}>
             <Typography variant="h5" className={classes.heading}>UPCOMING</Typography>
             <div>
-              {upcoming.map((question, i) => (
+              {_.reverse(upcoming).map((question, i) => (
                 <div className={classes.completedItem} key={i}>
                   <Typography variant="body1">{question.name} ({question.points})</Typography>
                 </div>

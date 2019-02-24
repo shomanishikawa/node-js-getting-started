@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import Button from '@material-ui/core/Button';
 import Airtable from 'airtable';
 import _ from 'lodash';
 import { withStyles } from '@material-ui/core/styles';
@@ -172,6 +174,17 @@ class BallotPage extends Component {
               </FormControl>
             </Grid>
           ))}
+          <Button
+            component={({ ...props }) => (
+              <Link to={'/app'} {...props} />
+            )}
+            className={classes.button}
+            variant="contained"
+            size="medium"
+            color="secondary"
+          >
+            Submit
+          </Button>
         </Grid>
       ) : (
         <LinearProgress />

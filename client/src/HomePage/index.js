@@ -100,6 +100,10 @@ class HomePage extends Component {
     }, 0);
   }
 
+  getName(user) {
+    return user.get('name')
+  }
+
   render() {
     const { status, classes } = this.props;
     const { loaded, userLoaded, users, questions } = this.state;
@@ -113,7 +117,7 @@ class HomePage extends Component {
           <Grid item xs={12} sm={4}>
             <Typography variant="h5" className={classes.heading}>STANDINGS</Typography>
             <div>
-              {_.orderBy(users, [this.calculateScore.bind(this)], ['desc']).map((user, i) => (
+              {_.orderBy(users, [this.calculateScore.bind(this), this.getName.bind(this)], ['desc', 'asc']).map((user, i) => (
                 <div key={i}>
                   {status === 'closed' ? (
                     <Typography variant="subtitle1">

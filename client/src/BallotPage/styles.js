@@ -180,6 +180,11 @@ const styles = theme => ({
     top: '6px',
     left: '-9px',
     color: 'red',
+  },
+  button: {
+    width: '300px',
+    margin: '0 auto',
+    marginBottom: '100px',
   }
 });
 
